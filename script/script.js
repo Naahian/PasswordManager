@@ -14,7 +14,6 @@ function generatePassword(tempData, passLenLimit){
     if(options[0].checked == true && !word) {    tempData.push("ABCDEFGHIJKLMNOPQRSTUVWXYZ"); optionNum.push(1);    }
     if(options[1].checked == true) {    tempData.push("!\"#$%&\'()*+-./:;<=>?@[\\]^_\`{|}~"); optionNum.push(2);    }
     
-    console.log("t:",tempData);
     for(var i=0; i<passLenLimit; i++){
         
         if(!word) {
@@ -38,7 +37,7 @@ function generatePassword(tempData, passLenLimit){
         }        
     }
     tempPass.forEach( ch => {pass+=ch});
-    console.log(pass)
+    
     if(word){
         pass = pass.slice(0, (pass.length - word.length)+1);
         pass = word + pass;
@@ -53,13 +52,12 @@ function wordBased(passLenLimit){
     if(options[3].checked == true){     /////  word based checked
 
         word = words[ parseInt(rand() * words.length) ];
-        while(word.length > passLenLimit-3){                 //change word ilimPt
+        while(word.length > passLenLimit-3){                 //change word if exceeds passLenLimit
             word = words[ parseInt(rand() * words.length) ];
         }
 
         while(word.length < passLenLimit - 5){      //check and keep adding words untill it reaches limit (passLenLimit-3)
             var tempWord = words[ parseInt(rand() * words.length) ];
-            console.log("Wlen:"+word.length+" Tlen:"+tempWord.length);
             //check if it exceeds given length(passLenLimit-3)
             (word + tempWord).length < passLenLimit-3 ? (word+=tempWord) : (tempWord = words[ parseInt(rand() * words.length) ]);
         } 
@@ -69,16 +67,24 @@ function wordBased(passLenLimit){
 }
 
 
+function checkStrength(password){
+    var mark = password.length;
+    switch(true){
+        case mark<12: return "<span style='color:crimson'> weak </span>";
+        case mark>11 && mark<16: return "<span style='color:goldenrod'> medium </span>";
+        case mark>15 && mark<21: return "<span style='color:lime'> strong </span>";
+        case mark>20: return "<span style='color:green'> very strong </span>";
+    }
+}
+
 generateBtn.addEventListener("click", ()=>{
     
     var password, passLenLimit, tempData = [];
     data.forEach( ch =>{ tempData.push(ch)});
-    passLenLimit = options[2].checked==true ? parseInt(14 + rand()*12) :10;
-
-    
+    passLenLimit = options[2].checked==true ? parseInt(14 + rand()*12) : parseInt(10 + rand()*4); //set limit of password length
 
     password = generatePassword(tempData, passLenLimit);   
-    console.log("d:",data)
+    
     output.innerHTML = "<span>"+password+"</span>";
-    document.querySelector(".len").innerText ="length " + password.length;
+    document.querySelector(".len").innerHTML ="<span style='opacity:.7'>length " + password.length + " | <b>"+ checkStrength(password) + "</b></span>";
 });
